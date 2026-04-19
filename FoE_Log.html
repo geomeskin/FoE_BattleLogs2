@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"><div style="display: none;"></div>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoE — Battle Log</title>
+<link href="FoE_Log_files/css2.css" rel="stylesheet">
+<style>
+
+  :root {
+    --bg-deep: #0d0a07;
+    --bg-card: #1a1208;
+    --bg-input: #110e06;
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --gold-dim: #7a6530;
+    --amber: #d4820a;
+    --parchment: #e8d9b0;
+    --parchment-dim: #a89060;
+    --red-accent: #8b2020;
+    --green-accent: #2a5c2a;
+    --border: #3d2e10;
+    --border-gold: #5a4520;
+    --shadow: rgba(0,0,0,0.7);
+    --glow: rgba(201,168,76,0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background-color: var(--bg-deep);
+    background-image:
+      radial-gradient(ellipse at 20% 20%, rgba(201,168,76,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, rgba(139,32,32,0.06) 0%, transparent 60%),
+      url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a84c' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    color: var(--parchment);
+    font-family: 'Crimson Text', Georgia, serif;
+    font-size: 18px;
+    min-height: 100vh;
+    padding: 20px 16px 60px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 30px 0 24px;
+    position: relative;
+  }
+  .header::before, .header::after {
+    content: '';
+    display: block;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold-dim), transparent);
+    margin: 12px 0;
+  }
+  .header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(22px, 6vw, 36px);
+    font-weight: 700;
+    color: var(--gold-light);
+    letter-spacing: 0.08em;
+    text-shadow: 0 0 30px rgba(201,168,76,0.4), 0 2px 4px rgba(0,0,0,0.8);
+  }
+  .header .subtitle {
+    font-family: 'Crimson Text', serif;
+    font-style: italic;
+    color: var(--parchment-dim);
+    font-size: 15px;
+    margin-top: 4px;
+    letter-spacing: 0.05em;
+  }
+  .crown {
+    font-size: 28px;
+    display: block;
+    margin-bottom: 6px;
+    filter: drop-shadow(0 0 8px rgba(201,168,76,0.6));
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 0;
+    margin: 0 auto 28px;
+    max-width: 500px;
+    border: 1px solid var(--border-gold);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 12px 8px;
+    background: var(--bg-card);
+    border: none;
+    color: var(--parchment-dim);
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+  }
+  .tab-btn:first-child { border-right: 1px solid var(--border-gold); }
+  .tab-btn.active {
+    background: linear-gradient(135deg, #2a1e08, #1a1208);
+    color: var(--gold-light);
+    text-shadow: 0 0 12px rgba(201,168,76,0.5);
+  }
+  .tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 10%; right: 10%;
+    height: 2px;
+    background: var(--gold);
+    border-radius: 2px 2px 0 0;
+  }
+  .tab-btn:hover:not(.active) { color: var(--parchment); background: #1f1609; }
+
+  /* Form Card */
+  .form-card {
+    background: linear-gradient(160deg, #1e1508, #120e05);
+    border: 1px solid var(--border-gold);
+    border-radius: 6px;
+    padding: 28px 24px;
+    max-width: 500px;
+    margin: 0 auto 32px;
+    box-shadow: 0 8px 32px var(--shadow), inset 0 1px 0 rgba(201,168,76,0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  .form-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+  }
+
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--border-gold), transparent);
+  }
+
+  .field {
+    margin-bottom: 18px;
+  }
+  label {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  select, input[type="date"], input[type="number"], input[type="text"], textarea {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--parchment);
+    font-family: 'Crimson Text', serif;
+    font-size: 17px;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23c9a84c' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+  }
+  select:focus, input:focus, textarea:focus {
+    border-color: var(--gold-dim);
+    box-shadow: 0 0 0 2px var(--glow);
+  }
+  input[readonly] {
+    color: var(--parchment-dim);
+    cursor: default;
+    opacity: 0.8;
+  }
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.5;
+  }
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.7) sepia(1) saturate(2) hue-rotate(5deg);
+    opacity: 0.7;
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  /* Submit Button */
+  .submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #2a1e08, #3d2e10);
+    border: 1px solid var(--gold-dim);
+    border-radius: 4px;
+    color: var(--gold-light);
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    margin-top: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.08), transparent);
+    transition: left 0.4s ease;
+  }
+  .submit-btn:hover { border-color: var(--gold); color: var(--gold-light); box-shadow: 0 0 16px var(--glow); }
+  .submit-btn:hover::before { left: 100%; }
+  .submit-btn:active { transform: scale(0.98); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Status message */
+  .status-msg {
+    text-align: center;
+    padding: 10px;
+    border-radius: 3px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    margin-top: 14px;
+    display: none;
+  }
+  .status-msg.success { background: rgba(42,92,42,0.3); border: 1px solid #3a7a3a; color: #8fcc8f; display: block; }
+  .status-msg.error { background: rgba(139,32,32,0.3); border: 1px solid #8b2020; color: #cc7070; display: block; }
+  .status-msg.sending { background: rgba(201,168,76,0.1); border: 1px solid var(--border-gold); color: var(--gold-dim); display: block; }
+
+  /* Log Section */
+  .log-section {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  .log-header {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .log-header::before, .log-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border-gold));
+  }
+  .log-header::before { background: linear-gradient(to left, transparent, var(--border-gold)); }
+
+  .log-entry {
+    background: #13100600;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .log-entry:hover { border-color: var(--border-gold); }
+  .log-entry-type {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    padding: 2px 8px;
+    border-radius: 2px;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+  .log-entry-type.ge { background: rgba(42,92,42,0.4); color: #8fcc8f; border: 1px solid #3a6a3a; }
+  .log-entry-type.gbg { background: rgba(139,32,32,0.4); color: #cc8f8f; border: 1px solid #6a3a3a; }
+
+  .log-entry-main {
+    font-size: 16px;
+    color: var(--parchment);
+    margin-bottom: 4px;
+  }
+  .log-entry-main strong { color: var(--gold-light); }
+  .log-entry-meta {
+    font-size: 14px;
+    color: var(--parchment-dim);
+    font-style: italic;
+  }
+  .log-entry-notes {
+    font-size: 14px;
+    color: var(--parchment-dim);
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+  }
+  .log-empty {
+    text-align: center;
+    color: var(--parchment-dim);
+    font-style: italic;
+    padding: 30px 0;
+    font-size: 16px;
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Decorative divider */
+  .divider {
+    text-align: center;
+    color: var(--gold-dim);
+    font-size: 18px;
+    margin: 8px 0 24px;
+    letter-spacing: 0.3em;
+    opacity: 0.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="crown">⚔️</span>
+  <h1>FoE Battle Log</h1>
+  <p class="subtitle">Guild Expeditions &amp; Battlegrounds Record</p>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('ge')">⚗️ Guild Expedition</button>
+  <button class="tab-btn" onclick="switchTab('gbg')">🏰 Battlegrounds</button>
+</div>
+
+<!-- GE FORM -->
+<div id="tab-ge" class="tab-content active">
+  <div class="form-card">
+    <div class="section-title">Log GE Session</div>
+
+    <div class="field">
+      <label>City</label>
+      <select id="ge-city">
+        <option value="" selected="selected">— Select City —</option>
+        <option value="CTHG">Carthage (CTHG)</option>
+        <option value="PMTHS">Prometheopolis (PMTHS)</option>
+      </select>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Date Entered GE</label>
+        <input type="text" id="ge-date-entered" readonly>
+      </div>
+      <div class="field">
+        <label>Trial #</label>
+        <select id="ge-trial">
+          <option value="" selected="selected">— Trial —</option>
+          <!-- populated by JS -->
+        <option value="1">Trial 1</option><option value="2">Trial 2</option><option value="3">Trial 3</option><option value="4">Trial 4</option><option value="5">Trial 5</option><option value="6">Trial 6</option><option value="7">Trial 7</option><option value="8">Trial 8</option><option value="9">Trial 9</option><option value="10">Trial 10</option><option value="11">Trial 11</option><option value="12">Trial 12</option><option value="13">Trial 13</option><option value="14">Trial 14</option><option value="15">Trial 15</option><option value="16">Trial 16</option><option value="17">Trial 17</option><option value="18">Trial 18</option><option value="19">Trial 19</option><option value="20">Trial 20</option><option value="21">Trial 21</option><option value="22">Trial 22</option><option value="23">Trial 23</option><option value="24">Trial 24</option><option value="25">Trial 25</option><option value="26">Trial 26</option><option value="27">Trial 27</option><option value="28">Trial 28</option><option value="29">Trial 29</option><option value="30">Trial 30</option></select>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Level Reached</label>
+        <select id="ge-level">
+          <option value="" selected="selected">— Level —</option>
+          <option value="L1 Complete">Level 1 Complete</option>
+          <option value="L2 Complete">Level 2 Complete</option>
+          <option value="L3 Complete">Level 3 Complete</option>
+          <option value="L4 Complete">Level 4 Complete</option>
+          <option value="L5 Complete">Level 5 Complete</option>
+          <option disabled="disabled">──────</option>
+          <option value="L5 Incomplete">Level 5 Incomplete</option>
+          <option value="L4 Incomplete">Level 4 Incomplete</option>
+          <option value="L3 Incomplete">Level 3 Incomplete</option>
+          <option value="L2 Incomplete">Level 2 Incomplete</option>
+          <option value="L1 Incomplete">Level 1 Incomplete</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Date Completed</label>
+        <input type="date" id="ge-date-completed" value="2026-04-09">
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Contributed Points</label>
+        <input type="number" id="ge-points" min="0" placeholder="e.g. 1747608">
+      </div>
+      <div class="field">
+        <label>Guild Rank</label>
+        <input type="number" id="ge-rank" min="1" placeholder="e.g. 3">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Encounters Completed</label>
+      <input type="number" id="ge-enc-completed" min="0" placeholder="e.g. 80">
+    </div>
+
+    <div class="field">
+      <label>Notes</label>
+      <textarea id="ge-notes" placeholder="Optional notes..."></textarea>
+    </div>
+
+    <button class="submit-btn" onclick="submitGE()">⚔ Record Expedition</button>
+    <div class="status-msg" id="ge-status"></div>
+  </div>
+
+  <div class="log-section">
+    <div class="log-header">Recent GE Entries</div>
+    <div id="ge-log-list"><div class="log-empty">No GE entries recorded yet.</div></div>
+  </div>
+</div>
+
+<!-- GBG FORM -->
+<div id="tab-gbg" class="tab-content">
+  <div class="form-card">
+    <div class="section-title">Log GBG Season</div>
+
+    <div class="field">
+      <label>City</label>
+      <select id="gbg-city">
+        <option value="" selected="selected">— Select City —</option>
+        <option value="CTHG">Carthage (CTHG)</option>
+        <option value="PMTHS">Prometheopolis (PMTHS)</option>
+      </select>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Trial #</label>
+        <select id="gbg-trial">
+          <option value="" selected="selected">— Trial —</option>
+          <!-- populated by JS -->
+        <option value="1">Trial 1</option><option value="2">Trial 2</option><option value="3">Trial 3</option><option value="4">Trial 4</option><option value="5">Trial 5</option><option value="6">Trial 6</option><option value="7">Trial 7</option><option value="8">Trial 8</option><option value="9">Trial 9</option><option value="10">Trial 10</option><option value="11">Trial 11</option><option value="12">Trial 12</option><option value="13">Trial 13</option><option value="14">Trial 14</option><option value="15">Trial 15</option><option value="16">Trial 16</option><option value="17">Trial 17</option><option value="18">Trial 18</option><option value="19">Trial 19</option><option value="20">Trial 20</option><option value="21">Trial 21</option><option value="22">Trial 22</option><option value="23">Trial 23</option><option value="24">Trial 24</option><option value="25">Trial 25</option><option value="26">Trial 26</option><option value="27">Trial 27</option><option value="28">Trial 28</option><option value="29">Trial 29</option><option value="30">Trial 30</option></select>
+      </div>
+      <div class="field">
+        <label>Battles Fought</label>
+        <input type="number" id="gbg-battles" min="0" placeholder="e.g. 392">
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Start Date</label>
+        <input type="date" id="gbg-start-date">
+      </div>
+      <div class="field">
+        <label>End Date</label>
+        <input type="date" id="gbg-end-date" value="2026-04-09">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Peak Attrition Reached</label>
+      <input type="number" id="gbg-attrition" min="0" placeholder="e.g. 72">
+    </div>
+
+    <div class="field">
+      <label>Notes</label>
+      <textarea id="gbg-notes" placeholder="Optional notes..."></textarea>
+    </div>
+
+    <button class="submit-btn" onclick="submitGBG()">🏰 Record Season</button>
+    <div class="status-msg" id="gbg-status"></div>
+  </div>
+
+  <div class="log-section">
+    <div class="log-header">Recent GBG Entries</div>
+    <div id="gbg-log-list"><div class="log-empty">No GBG entries recorded yet.</div></div>
+  </div>
+</div>
+
+<script>
+  const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxNYEEwmsD7efYBUGdLxZzapGQYMzAYCCLe2t7UrInHN3AwfoER9gnpfr6blcuhulKsnQ/exec';
+  const LOCAL_KEY_GE = 'foe_ge_log';
+  const LOCAL_KEY_GBG = 'foe_gbg_log';
+
+  // Populate trial dropdowns
+  function populateTrials() {
+    const geSelect = document.getElementById('ge-trial');
+    const gbgSelect = document.getElementById('gbg-trial');
+    for (let i = 1; i <= 30; i++) {
+      geSelect.innerHTML += `<option value="${i}">Trial ${i}</option>`;
+      gbgSelect.innerHTML += `<option value="${i}">Trial ${i}</option>`;
+    }
+  }
+
+  // Returns current local datetime as YYYY-MM-DD HH:MM (24hr)
+  function getNow() {
+    const now = new Date();
+    const date = now.toLocaleDateString('en-CA'); // YYYY-MM-DD
+    const hours = String(now.getHours()).padStart(2, '0');
+    const mins = String(now.getMinutes()).padStart(2, '0');
+    return `${date} ${hours}:${mins}`;
+  }
+
+  // Set default dates on load
+  function setDefaultDates() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('ge-date-entered').value = getNow();
+    document.getElementById('ge-date-completed').value = today;
+    document.getElementById('gbg-end-date').value = today;
+  }
+
+  // Tab switching
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach((b, i) => {
+      b.classList.toggle('active', (tab === 'ge' && i === 0) || (tab === 'gbg' && i === 1));
+    });
+    document.getElementById('tab-ge').classList.toggle('active', tab === 'ge');
+    document.getElementById('tab-gbg').classList.toggle('active', tab === 'gbg');
+  }
+
+  // Status helpers
+  function setStatus(id, type, msg) {
+    const el = document.getElementById(id);
+    el.className = `status-msg ${type}`;
+    el.textContent = msg;
+  }
+  function clearStatus(id) {
+    const el = document.getElementById(id);
+    el.className = 'status-msg';
+    el.textContent = '';
+  }
+
+  // Local storage helpers
+  function saveLocal(key, entry) {
+    const log = JSON.parse(localStorage.getItem(key) || '[]');
+    log.unshift(entry); // newest first
+    localStorage.setItem(key, JSON.stringify(log));
+  }
+  function getLocal(key) {
+    return JSON.parse(localStorage.getItem(key) || '[]');
+  }
+
+  // Render log entries
+  function renderGELog() {
+    const log = getLocal(LOCAL_KEY_GE);
+    const container = document.getElementById('ge-log-list');
+    if (log.length === 0) {
+      container.innerHTML = '<div class="log-empty">No GE entries recorded yet.</div>';
+      return;
+    }
+    container.innerHTML = log.slice(0, 10).map(e => `
+      <div class="log-entry">
+        <span class="log-entry-type ge">GE</span>
+        <div class="log-entry-main"><strong>${e.city}</strong> — Trial ${e.trial} — ${e.levelCompleted}</div>
+        <div class="log-entry-meta">Entered: ${e.dateEntered}${e.dateCompleted ? ' · Completed: ' + e.dateCompleted : ''}</div>
+        <div class="log-entry-meta">${e.contributedPoints ? 'Points: ' + Number(e.contributedPoints).toLocaleString() : ''}${e.guildRank ? ' · Rank: #' + e.guildRank : ''}${e.encCompleted ? ' · Encounters: ' + e.encCompleted + '/' + (e.encAvailable || '?') : ''}</div>
+        ${e.notes ? `<div class="log-entry-notes">${e.notes}</div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  function renderGBGLog() {
+    const log = getLocal(LOCAL_KEY_GBG);
+    const container = document.getElementById('gbg-log-list');
+    if (log.length === 0) {
+      container.innerHTML = '<div class="log-empty">No GBG entries recorded yet.</div>';
+      return;
+    }
+    container.innerHTML = log.slice(0, 10).map(e => `
+      <div class="log-entry">
+        <span class="log-entry-type gbg">GBG</span>
+        <div class="log-entry-main"><strong>${e.city}</strong> — Trial ${e.trial} — ${e.battlesFought} battles</div>
+        <div class="log-entry-meta">${e.startDate} → ${e.endDate} · Peak attrition: ${e.peakAttrition || '—'}</div>
+        ${e.notes ? `<div class="log-entry-notes">${e.notes}</div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  // Submit GE
+  async function submitGE() {
+    clearStatus('ge-status');
+    const city = document.getElementById('ge-city').value;
+    document.getElementById('ge-date-entered').value = getNow();
+    const dateEntered = document.getElementById('ge-date-entered').value;
+    const trial = document.getElementById('ge-trial').value;
+    const levelCompleted = document.getElementById('ge-level').value;
+    const dateCompleted = document.getElementById('ge-date-completed').value;
+    const contributedPoints = document.getElementById('ge-points').value;
+    const guildRank = document.getElementById('ge-rank').value;
+    const encCompleted = document.getElementById('ge-enc-completed').value;
+    const encAvailable = 80; // Standard GE cap — hardcoded, update here if InnoGames changes it
+    const notes = document.getElementById('ge-notes').value.trim();
+
+    if (!city || !dateEntered || !trial || !levelCompleted) {
+      setStatus('ge-status', 'error', 'Please fill in all required fields.');
+      return;
+    }
+
+    const entry = { formType: 'GE', city, dateEntered, trial, levelCompleted, dateCompleted, contributedPoints, guildRank, encCompleted, encAvailable, notes };
+
+    const btn = document.querySelector('#tab-ge .submit-btn');
+    btn.disabled = true;
+    setStatus('ge-status', 'sending', 'Recording expedition...');
+
+    try {
+      await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry)
+      });
+      saveLocal(LOCAL_KEY_GE, entry);
+      renderGELog();
+      setStatus('ge-status', 'success', '⚔ Expedition recorded successfully!');
+      // Reset form
+      document.getElementById('ge-city').value = '';
+      document.getElementById('ge-trial').value = '';
+      document.getElementById('ge-level').value = '';
+      document.getElementById('ge-points').value = '';
+      document.getElementById('ge-rank').value = '';
+      document.getElementById('ge-enc-completed').value = '';
+      document.getElementById('ge-notes').value = '';
+    } catch (err) {
+      setStatus('ge-status', 'error', 'Failed to send. Check your connection.');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  // Submit GBG
+  async function submitGBG() {
+    clearStatus('gbg-status');
+    const city = document.getElementById('gbg-city').value;
+    const trial = document.getElementById('gbg-trial').value;
+    const startDate = document.getElementById('gbg-start-date').value;
+    const endDate = document.getElementById('gbg-end-date').value;
+    const battlesFought = document.getElementById('gbg-battles').value;
+    const peakAttrition = document.getElementById('gbg-attrition').value;
+    const notes = document.getElementById('gbg-notes').value.trim();
+
+    if (!city || !trial || !startDate || !endDate || !battlesFought) {
+      setStatus('gbg-status', 'error', 'Please fill in all required fields.');
+      return;
+    }
+
+    const entry = { formType: 'GBG', city, trial, startDate, endDate, battlesFought, peakAttrition, notes };
+
+    const btn = document.querySelector('#tab-gbg .submit-btn');
+    btn.disabled = true;
+    setStatus('gbg-status', 'sending', 'Recording season...');
+
+    try {
+      await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry)
+      });
+      saveLocal(LOCAL_KEY_GBG, entry);
+      renderGBGLog();
+      setStatus('gbg-status', 'success', '🏰 Season recorded successfully!');
+      // Reset form
+      document.getElementById('gbg-city').value = '';
+      document.getElementById('gbg-trial').value = '';
+      document.getElementById('gbg-battles').value = '';
+      document.getElementById('gbg-attrition').value = '';
+      document.getElementById('gbg-notes').value = '';
+    } catch (err) {
+      setStatus('gbg-status', 'error', 'Failed to send. Check your connection.');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  // Init
+  populateTrials();
+  setDefaultDates();
+  renderGELog();
+  renderGBGLog();
+</script>
+
+
+</body></html>
